@@ -1,3 +1,4 @@
+import { cloneElement, Children } from "react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "./Admin";
 
@@ -25,22 +26,29 @@ export const NotFound = () => {
   );
 };
 
-export const Navigation = () => {
-  const { menus } = useAdmin();
-
+export const Navigation = ({ menus }) => {
   return (
-    <ul>
-      {menus.map((menu) => (
-        <li key={menu.text}>
-          <Link to={menu.link}>{menu.text}</Link>
-        </li>
-      ))}
-    </ul>
+    <ul>{menus.map((menu, index) => cloneElement(menu, { key: index }))}</ul>
+  );
+};
+
+export const Menu = ({ text, path, children }) => {
+  const menus = Children.toArray(children);
+  return (
+    <li>
+      {path ? <Link to={path}>{text}</Link> : text}
+      {children ? (
+        <ul>
+          {menus.map((menu, index) => cloneElement(menu, { key: index }))}
+        </ul>
+      ) : null}
+    </li>
   );
 };
 
 export const Layout = ({ children }) => {
   const {
+    menus,
     components: { Navigation },
   } = useAdmin();
   return (
@@ -48,7 +56,7 @@ export const Layout = ({ children }) => {
       <nav>Layout</nav>
       <div style={{ display: "flex" }}>
         <div style={{ flexBasis: 200 }}>
-          <Navigation />
+          <Navigation menus={menus} />
         </div>
         <div>{children}</div>
       </div>

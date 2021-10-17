@@ -88,6 +88,15 @@ const AdminRouter = ({ routes }) => {
   );
 };
 
+export const Menu = (props) => {
+  // props = { text, path, icon, children }
+  const {
+    components: { Menu: MenuComponent },
+  } = useAdmin();
+
+  return <MenuComponent {...props} />;
+};
+
 export const Admin = ({
   routes = [],
   menus = [],
@@ -99,14 +108,14 @@ export const Admin = ({
     components,
     clients,
     routes,
-    menus: [...menus, { text: "Dashboard", link: "/" }],
+    menus: [...menus, <Menu text={"Dashboard"} path={"/"} />],
   });
 
-  const addMenu = useCallback((menu) => {
+  const addMenu = useCallback((...menus) => {
     setState((state) => {
       return {
         ...state,
-        menus: [...state.menus, menu],
+        menus: [...state.menus, ...menus],
       };
     });
   }, []);

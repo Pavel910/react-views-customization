@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { Route, Switch } from "react-router";
-import { useAdmin } from "./Admin";
+import { Menu, useAdmin } from "./Admin";
 
 // Create a context and a hook to consume it
 const I18NContext = createContext();
@@ -31,21 +31,33 @@ export const withI18N = () => (Component) => {
   const withI18nProvider =
     (Component) =>
     ({ children, ...props }) => {
-      const { addMenu, addRoute, components: { Layout } } = useAdmin();
+      const {
+        addMenu,
+        addRoute,
+        components: { Layout },
+      } = useAdmin();
 
       useEffect(() => {
         setTimeout(() => {
-          addMenu({ text: "Dynamic #1", link: "/cms/dynamic/1" });
-          addMenu({ text: "Dynamic #2", link: "/cms/dynamic/2" });
+          addMenu(
+            <Menu text={"Dynamic Content"}>
+              <Menu text={"Dynamic #1"} path={"/cms/dynamic/1"} />
+              <Menu text={"Dynamic #2"} path={"/cms/dynamic/2"} />
+            </Menu>
+          );
           addRoute(
             <Route path={"/cms"}>
               <Switch>
-                  <Route path={"/cms/dynamic/1"}>
-                      <Layout><h2>Dynamic Route 1</h2></Layout>
-                  </Route>
-                  <Route path={"/cms/dynamic/2"}>
-                      <Layout><h2>Dynamic Route 2</h2></Layout>
-                  </Route>
+                <Route path={"/cms/dynamic/1"}>
+                  <Layout>
+                    <h2>Dynamic Route 1</h2>
+                  </Layout>
+                </Route>
+                <Route path={"/cms/dynamic/2"}>
+                  <Layout>
+                    <h2>Dynamic Route 2</h2>
+                  </Layout>
+                </Route>
               </Switch>
             </Route>
           );
@@ -73,7 +85,7 @@ export const withI18N = () => (Component) => {
     // Assign app menus (should these be React components? Not sure.)
     const menus = [
       ...(props.menus || []),
-      { text: "Locales", link: "/i18n/locales" },
+      <Menu text={"Locales"} path={"/i18n/locales"} />,
     ];
 
     // Assign app context providers

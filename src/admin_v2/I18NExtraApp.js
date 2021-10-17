@@ -1,6 +1,8 @@
-import { Route, Switch, /*useRouteMatch*/ } from "react-router";
+import React, { Children, cloneElement } from "react";
+import { Route, Switch, useRouteMatch /*useRouteMatch*/ } from "react-router";
+import { Link } from "react-router-dom";
 // import { Link } from "react-router-dom";
-import { useAdmin } from "./Admin";
+import { Menu, useAdmin } from "./Admin";
 
 const Settings = () => {
   const {
@@ -31,20 +33,37 @@ const Settings = () => {
 //   );
 // };
 
-// const CustomNavigation = () => {
-//   const { menus } = useAdmin();
-//   const { path } = useRouteMatch();
-//
-//   return (
-//     <ol>
-//       {menus.map((menu) => (
-//         <li key={menu.text}>
-//           <Link to={menu.link}>{path === menu.link ? "> " : null}{menu.text}</Link>
-//         </li>
-//       ))}
-//     </ol>
-//   );
-// };
+const CustomNavigation = ({ menus }) => {
+  const sorted = menus.sort((a, b) => {
+    return a.props.text.localeCompare(b.props.text);
+  });
+
+  return (
+    <ol>{sorted.map((menu, index) => cloneElement(menu, { key: index }))}</ol>
+  );
+};
+
+const CustomMenu = ({ text, path, children }) => {
+  const match = useRouteMatch();
+  const menus = Children.toArray(children);
+  return (
+    <li>
+      {path ? (
+        <Link to={path}>
+          {match.path === path ? "> " : null}
+          {text}
+        </Link>
+      ) : (
+        text
+      )}
+      {children ? (
+        <ul>
+          {menus.map((menu, index) => cloneElement(menu, { key: index }))}
+        </ul>
+      ) : null}
+    </li>
+  );
+};
 
 export const withI18NExtra = () => (Component) => {
   const I18NExtraApp = ({ children, ...props }) => {
@@ -59,11 +78,12 @@ export const withI18NExtra = () => (Component) => {
 
     const menus = [
       ...(props.menus || []),
-      { text: "Locale Settings", link: "/i18n/settings" },
+      <Menu text={"Locale Settings"} path={"/i18n/settings"} />,
     ];
 
     const components = {
       ...props.components,
+      // Menu: CustomMenu,
       // Layout: CustomLayout,
       // Navigation: CustomNavigation,
     };
