@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { App } from './admin_v2';
+import { App } from './view_manager_v2';
 
 ReactDOM.render(
   <React.StrictMode>

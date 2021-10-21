@@ -1,29 +1,45 @@
 import React, { useReducer } from "react";
 import { createView, withViewElement } from "./viewManager";
 
-const Input = withViewElement((props) => {
+export const Input = withViewElement((props) => {
   return (
-    <div>
+    <div className={"flex-child"}>
       <label>{props.label}</label>
       <input
         type={"text"}
         value={props.value}
         onChange={props.onChange}
         placeholder={props.placeholder}
+        disabled={props.disabled}
       />
     </div>
   );
 });
 
-const PagesListView = () => {
+Input.displayName = "Input";
+
+const PagesListViewLayout = ({ elements }) => {
+  return (
+    <div>
+      Default layout
+      {Object.keys(elements).map((key) =>
+        React.cloneElement(elements[key], { key })
+      )}
+    </div>
+  );
+};
+
+const PagesListViewComponent = ({ elements, layout }) => {
+  const Layout = layout || PagesListViewLayout;
+
   const [value, setValue] = useReducer((prev, next) => ({ ...prev, ...next }), {
     firstName: "",
     lastName: "",
     email: "",
   });
 
-  return (
-    <>
+  const viewElements = {
+    firstName: (
       <Input
         id={"firstName"}
         label={"First Name"}
@@ -31,6 +47,8 @@ const PagesListView = () => {
         onChange={(e) => setValue({ firstName: e.target.value })}
         placeholder={"Enter some text"}
       />
+    ),
+    lastName: (
       <Input
         id={"lastName"}
         label={"Last Name"}
@@ -38,6 +56,8 @@ const PagesListView = () => {
         onChange={(e) => setValue({ lastName: e.target.value })}
         placeholder={"Enter some text"}
       />
+    ),
+    email: (
       <Input
         id={"email"}
         label={"Email"}
@@ -45,10 +65,13 @@ const PagesListView = () => {
         onChange={(e) => setValue({ email: e.target.value })}
         placeholder={"Enter some text"}
       />
-    </>
-  );
+    ),
+    submitButton: <button onClick={() => alert("Yo!")}>Submit</button>,
+    ...elements,
+  };
+
+  return <Layout elements={viewElements} />;
 };
 
-export const createPagesListView = (id) => {
-  return createView(id, <PagesListView />);
-};
+export const PagesListView = createView("pagesList", PagesListViewComponent);
+PagesListView.displayName = "PagesListView";
